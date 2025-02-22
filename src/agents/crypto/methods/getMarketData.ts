@@ -4,7 +4,7 @@ import type {
   KrakenMarkets,
 } from "@/agents/crypto/types";
 import axios, { AxiosError } from "axios";
-import { mapCoinMarketList } from "../../../server/api/dto/mapCoinMarketList";
+import { mapCoinMarketList } from "../../../server/api/dto/crypto/mapCoinMarketList";
 import { sleep } from "@trpc/server/unstable-core-do-not-import";
 import { env } from "@/env";
 import { UnexpectedError } from "@/lib/dto/error";

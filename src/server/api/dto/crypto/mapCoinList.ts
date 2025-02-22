@@ -3,7 +3,7 @@ import {
   coinListSchema,
   type CoinList,
 } from "@/agents/crypto/types";
-import { isArray, isObject } from "@/utils/parse";
+import { isArray, isObject } from "@/lib/dto/parse";
 import { z } from "zod";
 
 export const mapCoinList = (input: unknown): CoinList => {

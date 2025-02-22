@@ -1,4 +1,4 @@
-import { kraken } from "@/agents/crypto/context/kraken";
+import { kraken } from "@/agents/crypto/context";
 import { UnexpectedError } from "@/lib/dto/error";
 
 export const getKrakenEURBalance = async () => {

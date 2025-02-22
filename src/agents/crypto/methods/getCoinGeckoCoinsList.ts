@@ -1,6 +1,6 @@
 import axios from "axios";
 import { env } from "@/env";
-import { mapCoinList } from "@/server/api/dto/mapCoinList";
+import { mapCoinList } from "@/server/api/dto/crypto/mapCoinList";
 import { UnexpectedError } from "@/lib/dto/error";
 
 export const getCoinGeckoCoinsList = async () => {

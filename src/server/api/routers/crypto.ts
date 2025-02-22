@@ -1,18 +1,18 @@
-import { model } from "@/ai/models/google";
+import { models } from "@/ai/models";
 import {
   system as cryptoSystemPrompt,
   prompt as cryptoUserPrompt,
-} from "@/agents/crypto/ai/prompts/crypto";
+} from "@/agents/crypto/ai/prompts";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { generateText } from "ai";
-import { getBalance } from "@/agents/crypto/ai/tools/crypto/getBalance";
-import { getCoinsMarketData } from "@/agents/crypto/ai/tools/crypto/getCoinsMarketData";
-import { setBuyOrder } from "@/agents/crypto/ai/tools/crypto/setBuyOrder";
+import { getBalance } from "@/agents/crypto/ai/tools/getBalance";
+import { getCoinsMarketData } from "@/agents/crypto/ai/tools/getCoinsMarketData";
+import { setBuyOrder } from "@/agents/crypto/ai/tools/setBuyOrder";
 
 export const cryptoRouter = createTRPCRouter({
   cryptoTradingAgent: publicProcedure.query(async () => {
     const response = await generateText({
-      model,
+      model: models.google,
       system: cryptoSystemPrompt,
       prompt: cryptoUserPrompt,
       tools: {

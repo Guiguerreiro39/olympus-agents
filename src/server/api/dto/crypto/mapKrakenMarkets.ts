@@ -3,7 +3,7 @@ import {
   type ValidObject,
   type KrakenMarkets,
 } from "@/agents/crypto/types";
-import { isObject } from "@/utils/parse";
+import { isObject } from "@/lib/dto/parse";
 
 import { z } from "zod";
 
