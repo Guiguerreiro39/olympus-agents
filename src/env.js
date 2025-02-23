@@ -13,6 +13,7 @@ export const env = createEnv({
     KRAKEN_PRIVATE_KEY: z.string(),
     QSTASH_TOKEN: z.string(),
     QSTASH_URL: z.string(),
+    DATABASE_URL: z.string(),
   },
 
   /**
@@ -36,6 +37,7 @@ export const env = createEnv({
     NEXT_PUBLIC_COINGECKO_API_URL: process.env.NEXT_PUBLIC_COINGECKO_API_URL,
     QSTASH_TOKEN: process.env.QSTASH_TOKEN,
     QSTASH_URL: process.env.QSTASH_URL,
+    DATABASE_URL: process.env.DATABASE_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
