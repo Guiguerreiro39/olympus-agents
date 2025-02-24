@@ -24,20 +24,15 @@ export const setKrakenBuyOrder = async ({
 
     // 2. Create the initial BUY order
     const params = {
-      stopLoss: {
-        triggerPrice: stopPrice,
-        type: "market",
-      },
-      takeProfit: {
-        triggerPrice: profitPrice,
-        type: "market",
-      },
+      takeProfitPrice: profitPrice,
+      stopLossPrice: stopPrice,
     };
+
     const buyOrder = await kraken.createOrder(
       symbol,
       "limit",
       "buy",
-      amount,
+      symbolAmount,
       buyPrice,
       params,
     );
