@@ -19,6 +19,9 @@ export const setKrakenBuyOrder = async ({
   profitPrice,
 }: Props) => {
   try {
+    // 0. Fetch the Ticker
+    const ticker = await kraken.fetchTicker(symbol);
+
     // 1. Calculate the Symbol Amount to Buy with EUR
     const symbolAmount = +(amount / buyPrice).toFixed(4);
 
@@ -28,12 +31,15 @@ export const setKrakenBuyOrder = async ({
       stopLossPrice: stopPrice,
     };
 
+    const bestBuyPrice =
+      ticker.ask && ticker.ask < buyPrice ? ticker.ask : buyPrice;
+
     const buyOrder = await kraken.createOrder(
       symbol,
       "limit",
       "buy",
       symbolAmount,
-      buyPrice,
+      bestBuyPrice,
       params,
     );
 
