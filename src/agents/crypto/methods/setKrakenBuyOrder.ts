@@ -22,27 +22,43 @@ export const setKrakenBuyOrder = async ({
     // 1. Calculate the Symbol Amount to Buy with EUR
     const symbolAmount = +(amount / buyPrice).toFixed(4);
 
-    // 2. Place Buy Market Order based on EUR amount with Take Profit and Stop Loss
-    const krakenOrder = await kraken.createOrderWithTakeProfitAndStopLoss(
+    // 2. Create the initial BUY order
+    const buyOrder = await kraken.createOrder(
       symbol,
       "limit",
       "buy",
-      symbolAmount,
+      amount,
       buyPrice,
+    );
+
+    // 3. Create TAKE PROFIT order
+    await kraken.createOrder(
+      symbol,
+      "limit", // Kraken order type for take profit limit
+      "sell",
+      symbolAmount, // Same amount as the buy order
       profitPrice,
+    );
+
+    // 4. Create STOP LOSS order
+    await kraken.createOrder(
+      symbol,
+      "limit", // Kraken order type for stop loss limit
+      "sell",
+      symbolAmount, // Same amount as the buy order
       stopPrice,
     );
 
-    // 3. Store the Order in the Database
+    // 5. Store the Order in the Database
     const order: typeof orders.$inferInsert = {
-      krakenOrderId: krakenOrder.id,
+      krakenOrderId: buyOrder.id,
       symbol,
       quoteAmount: amount,
       baseAmount: symbolAmount,
       buyPrice: buyPrice,
       stopPrice: stopPrice,
       profitPrice: profitPrice,
-      status: krakenOrder.status ?? "pending",
+      status: buyOrder.status ?? "pending",
     };
 
     await db.insert(orders).values(order);
