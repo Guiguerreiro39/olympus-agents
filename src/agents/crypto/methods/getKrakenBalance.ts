@@ -6,6 +6,18 @@ import { db } from "@/db";
 export const getKrakenEURBalance = async () => {
   try {
     const balance = await kraken.fetchBalance();
+    const result = {
+      balance: 0,
+    };
+
+    if ("EUR.F" in balance) {
+      // Insert balance in the Database
+      const currentBalance: typeof balanceHistory.$inferInsert = {
+        balance: balance["EUR.F"].free ?? 0,
+      };
+
+      result.balance += currentBalance.balance;
+    }
 
     if ("EUR" in balance) {
       // Insert balance in the Database
@@ -13,12 +25,12 @@ export const getKrakenEURBalance = async () => {
         balance: balance.EUR.free ?? 0,
       };
 
-      await db.insert(balanceHistory).values(currentBalance);
-
-      return balance.EUR.free;
+      result.balance += currentBalance.balance;
     }
 
-    return 0;
+    await db.insert(balanceHistory).values(result);
+
+    return result.balance;
   } catch (error) {
     throw new UnexpectedError("Failed to get Kraken balance", error);
   }
