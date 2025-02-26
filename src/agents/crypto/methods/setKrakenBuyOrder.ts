@@ -26,11 +26,6 @@ export const setKrakenBuyOrder = async ({
     const symbolAmount = +(amount / buyPrice).toFixed(4);
 
     // 2. Create the initial BUY order
-    const params = {
-      takeProfitPrice: profitPrice,
-      stopLossPrice: stopPrice,
-    };
-
     const bestBuyPrice =
       ticker.ask && ticker.ask < buyPrice ? ticker.ask : buyPrice;
 
@@ -40,10 +35,22 @@ export const setKrakenBuyOrder = async ({
       "buy",
       symbolAmount,
       bestBuyPrice,
-      params,
+      {
+        stopLossPrice: stopPrice,
+      },
     );
 
-    // 3. Store the Order in the Database
+    // 3. Create the TAKE PROFIT order
+    await kraken.createOrder(
+      symbol,
+      "limit",
+      "sell",
+      symbolAmount,
+      profitPrice,
+      { reduceOnly: true },
+    );
+
+    // 4. Store the Order in the Database
     const order: typeof orders.$inferInsert = {
       krakenOrderId: buyOrder.id,
       symbol,
