@@ -1,4 +1,5 @@
 import {
+  decimal,
   integer,
   pgTable,
   text,
@@ -29,7 +30,7 @@ export const orders = pgTable(
 
 export const balanceHistory = pgTable("balance_history", {
   id: uuid("id").primaryKey().defaultRandom(),
-  balance: integer("balance").notNull(),
+  balance: decimal("balance", { precision: 10, scale: 4 }).notNull(),
 
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });

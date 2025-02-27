@@ -1,0 +1,1 @@
+ALTER TABLE "balance_history" ALTER COLUMN "balance" SET DATA TYPE numeric(10, 4);

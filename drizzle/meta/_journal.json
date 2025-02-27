@@ -15,6 +15,13 @@
       "when": 1740676869150,
       "tag": "0001_remove-order-status",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1740677995344,
+      "tag": "0002_update-balance-to-decimal",
+      "breakpoints": true
     }
   ]
 }
