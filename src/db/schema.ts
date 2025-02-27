@@ -21,8 +21,6 @@ export const orders = pgTable(
     stopPrice: integer("stop_price").notNull(),
     profitPrice: integer("profit_price").notNull(),
 
-    status: text("status").notNull(),
-
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },

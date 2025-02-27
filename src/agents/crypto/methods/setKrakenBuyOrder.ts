@@ -6,7 +6,6 @@ import { orders } from "@/db/schema";
 type Props = {
   symbol: string;
   amount: number; // in Euro
-  buyPrice: number;
   stopPrice: number;
   profitPrice: number;
 };
@@ -14,7 +13,6 @@ type Props = {
 export const setKrakenBuyOrder = async ({
   symbol,
   amount,
-  buyPrice,
   stopPrice,
   profitPrice,
 }: Props) => {
@@ -22,44 +20,75 @@ export const setKrakenBuyOrder = async ({
     // 0. Fetch the Ticker
     const ticker = await kraken.fetchTicker(symbol);
 
+    if (!ticker.ask) throw new Error("Failed to fetch ticker");
+
     // 1. Calculate the Symbol Amount to Buy with EUR
-    const symbolAmount = +(amount / buyPrice).toFixed(4);
+    const symbolAmount = +(amount / ticker.ask).toFixed(4);
 
     // 2. Create the initial BUY order
-    const bestBuyPrice =
-      ticker.ask && ticker.ask < buyPrice ? ticker.ask : buyPrice;
+    const buyOrder = await kraken.createMarketBuyOrder(symbol, symbolAmount, {
+      stopLossPrice: stopPrice,
+    });
 
-    const buyOrder = await kraken.createOrder(
-      symbol,
-      "limit",
-      "buy",
-      symbolAmount,
-      bestBuyPrice,
-      {
-        stopLossPrice: stopPrice,
-      },
-    );
+    // 3. Check the status of the order and retry if necessary
+    let orderStatus = buyOrder;
+    const maxRetries = 5;
+    let retryCount = 0;
 
-    // 3. Create the TAKE PROFIT order
+    while (
+      retryCount < maxRetries &&
+      orderStatus.status !== "closed" &&
+      orderStatus.status !== "canceled"
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2 seconds
+
+      try {
+        orderStatus = await kraken.fetchOrder(buyOrder.id); // Fetch order status using buyOrder.id
+        console.log(
+          `Order status check (${retryCount + 1}):`,
+          orderStatus.status,
+        );
+      } catch (fetchError) {
+        console.error("Error fetching order status:", fetchError);
+        break; // Exit loop on error
+      }
+      retryCount++;
+    }
+
+    if (orderStatus.status !== "closed" && orderStatus.status !== "filled") {
+      // Verify Kraken's filled/closed status
+      console.error(
+        `Main BUY order not filled after ${maxRetries} retries. Status:`,
+        orderStatus.status,
+      );
+
+      await kraken.cancelOrder(buyOrder.id);
+      return;
+    }
+
+    // 4. Create the TAKE PROFIT order
     await kraken.createOrder(
       symbol,
       "limit",
       "sell",
       symbolAmount,
       profitPrice,
-      { reduceOnly: true },
+      {
+        ordertype: "take-profit-limit",
+        price: profitPrice,
+        triggerprice: profitPrice,
+      },
     );
 
-    // 4. Store the Order in the Database
+    // 5. Store the Order in the Database
     const order: typeof orders.$inferInsert = {
       krakenOrderId: buyOrder.id,
       symbol,
       quoteAmount: amount,
       baseAmount: symbolAmount,
-      buyPrice: buyPrice,
+      buyPrice: ticker.ask,
       stopPrice: stopPrice,
       profitPrice: profitPrice,
-      status: buyOrder.status ?? "pending",
     };
 
     await db.insert(orders).values(order);
