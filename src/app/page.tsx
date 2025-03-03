@@ -1,3 +1,4 @@
+import { kraken } from "@/agents/crypto/context";
 import {
   getKrakenMarkets,
   getCoinGeckoCoinsList,
@@ -9,9 +10,9 @@ export default async function Home() {
   // const krakenMarkets = await getKrakenMarkets();
   // const coinList = await getCoinGeckoCoinsList();
   // const marketData = await getMarketData({ krakenMarkets, coinList });
-  const balance = await getKrakenEURBalance();
+  // const balance = await getKrakenEURBalance();
 
-  console.log(balance);
+  console.log(await kraken.fetchOrder("O7IUTU-XGPPQ-C42C3B"));
 
   return (
     <div>
