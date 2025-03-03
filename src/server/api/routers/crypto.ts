@@ -8,9 +8,16 @@ import { generateText } from "ai";
 import { getBalance } from "@/agents/crypto/ai/tools/getBalance";
 import { getCoinsMarketData } from "@/agents/crypto/ai/tools/getCoinsMarketData";
 import { setBuyOrder } from "@/agents/crypto/ai/tools/setBuyOrder";
+import { getKrakenEURBalance } from "@/agents/crypto/methods";
 
 export const cryptoRouter = createTRPCRouter({
   cryptoTradingAgent: publicProcedure.query(async () => {
+    const balance = await getKrakenEURBalance();
+
+    if (balance < 20) {
+      return { text: "Insufficient balance" };
+    }
+
     const response = await generateText({
       model: models.google,
       system: cryptoSystemPrompt,
@@ -22,8 +29,6 @@ export const cryptoRouter = createTRPCRouter({
       },
       maxSteps: 3,
     });
-
-    console.log(response.text);
 
     return response.text;
   }),
